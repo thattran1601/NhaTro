@@ -1,26 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function App() {
-  // state (biến trạng thái)
-  const [count, setCount] = useState(0);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    fetch("https://nhatro-backend-ka3b.onrender.com/api/message")
+      .then(res => res.json())
+      .then(data => setMessage(data.message));
+  }, []);
 
   return (
-    <div style={styles.container}>
-      <h1>Xin chào React 👋</h1>
-
-      <p>Bạn đã click: {count} lần</p>
-
-      <button onClick={() => setCount(count + 1)} style={styles.button}>
-        Click tôi
-      </button>
-
-      <button onClick={() => setCount(0)} style={styles.reset}>
-        Reset
-      </button>
+    <div style={{ textAlign: "center", marginTop: "100px" }}>
+      <h1>{message}</h1>
     </div>
   );
 }
 
+export default App;
 // CSS viết trong JS
 const styles = {
   container: {
