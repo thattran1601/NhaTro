@@ -5,26 +5,26 @@ const API = axios.create({
 });
 
 export const getAllPhong = () => {
-  return API.get("/phong")  // Gọi đúng endpoint đã define trong baseURL
+  return API.get("/api/phong")  // Gọi đúng endpoint đã define trong baseURL
 }
 
 export const getPhongById = (id) => {
-  return API.get(`/phong/${id}`)
+  return API.get(`/api/phong/${id}`)
 }
 
 export const createPhong = (data) => {
-  return API.post("/phong", data)
+  return API.post("/api/phong", data)
 }
 
 export const updatePhong = (id, data) => {
-  return API.put(`/phong/${id}`, data)
+  return API.put(`/api/phong/${id}`, data)
 }
 
 export const deletePhong = (id) => {
-  return API.delete(`/phong/${id}`)
+  return API.delete(`/api/phong/${id}`)
 }
 
 export const getChiTietPhong = (id) =>
-  API.get(`/phong/${id}/chitiet`);
+  API.get(`/api/phong/${id}/chitiet`);
 
 export default API
