@@ -10,7 +10,7 @@ import {
 import CustomerModal from "../components/CustomerModal";
 import ContractModal from "../components/ContractModal";
 import { getAllPhong } from "../api/Phongapi";
-import { createHopdong, getAllHopdong } from "../api/Hopdongapi";
+import { createHopdong, getAllHopdong } from "../api/HopdongApi";
 
 export default function CustomerPage() {
   const navigate = useNavigate();
