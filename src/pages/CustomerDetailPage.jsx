@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { getKhachhangById } from "../api/KhachhangApi";
-import { getAllHopdong } from "../api/Hopdongapi";
-import { getAllPhong } from "../api/Phongapi";
+import { getAllHopdong } from "../api/HopdongApi";
+import { getAllPhong } from "../api/PhongApi";
 
 export default function CustomerDetailPage() {
   const { id } = useParams();
