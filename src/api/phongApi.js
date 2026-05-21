@@ -25,6 +25,6 @@ export const deletePhong = (id) => {
 }
 
 export const getChiTietPhong = (id) =>
-  API.get(`/api/phong/${id}/chitiet`);
+  API.get(`/api/phong/chitietphong/${id} `);
 
 export default API

@@ -122,7 +122,7 @@ export default function ContractPage() {
         </h1>
 
         <p className="text-gray-400 tracking-[0.35em] font-black mt-4">
-          SUNSHINE HOME DIGITAL CONTRACT MANAGEMENT
+          QUẢN LÝ HỢP ĐỒNG THUÊ PHÒNG
         </p>
       </div>
 
@@ -190,12 +190,8 @@ export default function ContractPage() {
               </div>
             </div>
 
-            <div className="border-t mt-12 pt-8 grid grid-cols-2 gap-4">
-              <button className="bg-[#f8faf9] py-4 rounded-2xl font-black">
-                IN
-              </button>
-
-              <button className="bg-[#09152f] text-white py-4 rounded-2xl font-black">
+            <div className="border-t mt-12 pt-8 grid gap-4">
+              <button className="bg-[#09152f]  text-white py-4 rounded-2xl font-black">
                 GIA HẠN
               </button>
             </div>

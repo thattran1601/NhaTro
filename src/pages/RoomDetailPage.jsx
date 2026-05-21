@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getChiTietPhong } from "../api/Phongapi";
+import { getChiTietPhong } from "../api/PhongApi";
 
 export default function RoomDetailPage() {
   const { id } = useParams();

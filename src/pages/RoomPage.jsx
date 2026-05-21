@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar"
 import Hero from "../components/Hero"
 import FilterTabs from "../components/FilterTabs"
 import RoomCard from "../components/RoomCard"
-import AddRoomModal from "../components/AddRoomModal"
+import AddRoomModal from "../components/addRoomModal"
 
 import {
   getAllPhong,

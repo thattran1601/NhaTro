@@ -6,7 +6,7 @@ export const getAllHopdong = () => {
     return API.get("/api/hopdong");
 }
 export const getHopdongByPhong = (maPhong) => {
-    return API.get(`/hopdong/phong/${maPhong}`);
+    return API.get(`/api/hopdong/phong/${maPhong}`);
 }   
 export const createHopdong = (data) => {
     return API.post("/api/hopdong", data);
