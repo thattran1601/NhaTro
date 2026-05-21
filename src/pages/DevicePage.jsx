@@ -11,7 +11,7 @@ import {
 
 import DeviceModal from "../components/DeviceModal";
 import AssignDeviceModal from "../components/AssignDeviceModal";
-import { getAllPhong } from "../api/PhongApi";
+import { getAllPhong } from "../api/phongApi";
 
 export default function DevicePage() {
   const [devices, setDevices] = useState([]);

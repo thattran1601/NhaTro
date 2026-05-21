@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { getKhachhangById } from "../api/KhachhangApi";
 import { getAllHopdong } from "../api/HopdongApi";
-import { getAllPhong } from "../api/PhongApi";
+import { getAllPhong } from "../api/phongApi";
 
 export default function CustomerDetailPage() {
   const { id } = useParams();

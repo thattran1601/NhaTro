@@ -9,7 +9,7 @@ import {
 
 import CustomerModal from "../components/CustomerModal";
 import ContractModal from "../components/ContractModal";
-import { getAllPhong } from "../api/PhongApi";
+import { getAllPhong } from "../api/phongApi";
 import { createHopdong, getAllHopdong } from "../api/HopdongApi";
 
 export default function CustomerPage() {

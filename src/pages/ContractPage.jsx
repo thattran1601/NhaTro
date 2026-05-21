@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { getHopdongByPhong } from "../api/HopdongApi";
-import { getPhongById } from "../api/PhongApi";
+import { getPhongById } from "../api/phongApi";
 import { getKhachhangById } from "../api/KhachhangApi";
 
 export default function ContractPage() {

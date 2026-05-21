@@ -10,7 +10,7 @@ import {
   createPhong,
   updatePhong,
   deletePhong
-} from "../api/PhongApi"
+} from "../api/phongApi"
 
 export default function App() {
 
