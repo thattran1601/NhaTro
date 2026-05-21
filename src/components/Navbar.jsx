@@ -11,10 +11,10 @@ export default function Navbar() {
     <div className="bg-white rounded-3xl shadow-md px-10 py-6 flex justify-between items-center">
 
       <div>
-        <h1 className="text-3xl font-bold">
-          PHÒNG TRỌ
+         <h1 className="text-2xl font-black mt-5 text-[#09152f]">
+          QUẢN LÝ
           <span className="text-green-500 ml-2">
-            QUẢN LÝ
+            PHÒNG TRỌ 
           </span>
         </h1>
       </div>

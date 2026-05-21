@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
 
-export default function CustomerModal({
-  customer,
-  onSave,
-  onClose
-}) {
-  const [form, setForm] = useState({
+export default function CustomerModal({ customer, onSave, onClose }) {
+  const emptyForm = {
     HoTen: "",
     CCCD: "",
     SDT: "",
-    AnhCCCD: ""
-  });
+    AnhCCCD: "",
+    ThanNhan: {
+      HoTen: "",
+      SDT: "",
+      QuanHe: "",
+    },
+  };
+
+  const [form, setForm] = useState(emptyForm);
+  const [showThanNhan, setShowThanNhan] = useState(false);
 
   useEffect(() => {
     if (customer) {
@@ -18,70 +22,206 @@ export default function CustomerModal({
         HoTen: customer.HoTen || "",
         CCCD: customer.CCCD || "",
         SDT: customer.SDT || "",
-        AnhCCCD: customer.AnhCCCD || ""
+        AnhCCCD: customer.AnhCCCD || "",
+        ThanNhan: {
+          HoTen: "",
+          SDT: "",
+          QuanHe: "",
+        },
       });
+
+      setShowThanNhan(false);
+    } else {
+      setForm(emptyForm);
+      setShowThanNhan(false);
     }
   }, [customer]);
 
   const handleChange = (e) => {
     setForm({
       ...form,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleThanNhanChange = (e) => {
+    setForm({
+      ...form,
+      ThanNhan: {
+        ...form.ThanNhan,
+        [e.target.name]: e.target.value,
+      },
+    });
+  };
+
+  const handleSubmit = () => {
+    if (!form.HoTen.trim()) {
+      return alert("Vui lòng nhập họ tên cư dân");
+    }
+
+    if (!form.CCCD.trim()) {
+      return alert("Vui lòng nhập CCCD");
+    }
+
+    if (!form.SDT.trim()) {
+      return alert("Vui lòng nhập số điện thoại");
+    }
+
+    if (showThanNhan) {
+      if (!form.ThanNhan.HoTen.trim()) {
+        return alert("Vui lòng nhập họ tên thân nhân");
+      }
+
+      if (!form.ThanNhan.SDT.trim()) {
+        return alert("Vui lòng nhập số điện thoại thân nhân");
+      }
+    }
+
+    onSave({
+      HoTen: form.HoTen,
+      CCCD: form.CCCD,
+      SDT: form.SDT,
+      AnhCCCD: form.AnhCCCD,
+      ThanNhan: showThanNhan ? form.ThanNhan : null,
     });
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-[36px] p-10 w-[560px] shadow-2xl">
-        <h2 className="text-3xl font-black text-[#09152f] mb-8">
-          {customer ? "CHỈNH SỬA CƯ DÂN" : "THÊM CƯ DÂN"}
-        </h2>
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-6">
+      <div className="bg-white rounded-[36px] p-10 w-[1000px] max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="flex justify-between items-start mb-8">
+          <div>
+            <h2 className="text-3xl font-black text-[#09152f]">
+              {customer ? "CHỈNH SỬA CƯ DÂN" : "THÊM CƯ DÂN"}
+            </h2>
 
-        <div className="space-y-5">
-          <input
-            name="HoTen"
-            value={form.HoTen}
-            onChange={handleChange}
-            placeholder="Họ tên"
-            className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
-          />
+            <p className="text-gray-400 font-bold mt-2">
+              {customer
+                ? "Cập nhật thông tin người thuê"
+                : "Nhập thông tin người thuê và thân nhân nếu có"}
+            </p>
+          </div>
 
-          <input
-            name="CCCD"
-            value={form.CCCD}
-            onChange={handleChange}
-            placeholder="CCCD"
-            className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
-          />
+          <button
+            onClick={onClose}
+            className="bg-gray-100 text-gray-500 w-12 h-12 rounded-2xl font-black hover:bg-gray-200 transition"
+          >
+            ✕
+          </button>
+        </div>
 
-          <input
-            name="SDT"
-            value={form.SDT}
-            onChange={handleChange}
-            placeholder="Số điện thoại"
-            className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
-          />
+        <div className={customer ? "grid grid-cols-1 gap-6" : "grid grid-cols-2 gap-8"}>
+          {/* CỘT THÔNG TIN KHÁCH HÀNG */}
+          <div>
+            <h3 className="text-xl font-black text-[#09152f] mb-5">
+              THÔNG TIN CƯ DÂN
+            </h3>
 
-          <input
-            name="AnhCCCD"
-            value={form.AnhCCCD}
-            onChange={handleChange}
-            placeholder="Link ảnh CCCD"
-            className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
-          />
+            <div className="space-y-5">
+              <input
+                name="HoTen"
+                value={form.HoTen}
+                onChange={handleChange}
+                placeholder="Họ tên"
+                className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+              />
+
+              <input
+                name="CCCD"
+                value={form.CCCD}
+                onChange={handleChange}
+                placeholder="CCCD"
+                className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+              />
+
+              <input
+                name="SDT"
+                value={form.SDT}
+                onChange={handleChange}
+                placeholder="Số điện thoại"
+                className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+              />
+
+              <input
+                name="AnhCCCD"
+                value={form.AnhCCCD}
+                onChange={handleChange}
+                placeholder="Link ảnh CCCD"
+                className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+              />
+            </div>
+          </div>
+
+          {/* CỘT THÔNG TIN THÂN NHÂN */}
+          {!customer && (
+            <div>
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-xl font-black text-[#09152f]">
+                  THÔNG TIN THÂN NHÂN
+                </h3>
+
+                <label className="flex items-center gap-3 text-sm font-black text-green-600 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showThanNhan}
+                    onChange={(e) => setShowThanNhan(e.target.checked)}
+                    className="w-5 h-5"
+                  />
+                  THÊM THÂN NHÂN
+                </label>
+              </div>
+
+              {showThanNhan ? (
+                <div className="space-y-5">
+                  <input
+                    name="HoTen"
+                    value={form.ThanNhan.HoTen}
+                    onChange={handleThanNhanChange}
+                    placeholder="Họ tên thân nhân"
+                    className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+                  />
+
+                  <input
+                    name="SDT"
+                    value={form.ThanNhan.SDT}
+                    onChange={handleThanNhanChange}
+                    placeholder="Số điện thoại thân nhân"
+                    className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+                  />
+
+                  <input
+                    name="QuanHe"
+                    value={form.ThanNhan.QuanHe}
+                    onChange={handleThanNhanChange}
+                    placeholder="Quan hệ: Cha, mẹ, anh, chị..."
+                    className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+                  />
+
+                  <div className="bg-green-50 text-green-600 px-6 py-5 rounded-2xl font-bold text-sm">
+                    Thân nhân sẽ được lưu kèm sau khi tạo cư dân thành công.
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-[#f6f7f8] rounded-2xl p-8 text-gray-400 font-bold leading-relaxed">
+                  Bạn có thể bật “Thêm thân nhân” để nhập người liên hệ khẩn cấp.
+                  Nếu chưa có thông tin, có thể bổ sung sau trong trang chi tiết khách hàng.
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex gap-4 mt-10">
           <button
-            onClick={() => onSave(form)}
-            className="flex-1 bg-green-600 text-white py-5 rounded-2xl font-black"
+            onClick={handleSubmit}
+            className="flex-1 bg-green-600 text-white py-5 rounded-2xl font-black hover:bg-green-700 transition"
           >
             LƯU
           </button>
 
           <button
             onClick={onClose}
-            className="flex-1 bg-gray-100 text-gray-500 py-5 rounded-2xl font-black"
+            className="flex-1 bg-gray-100 text-gray-500 py-5 rounded-2xl font-black hover:bg-gray-200 transition"
           >
             HỦY
           </button>

@@ -4,7 +4,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getKhachhangById } from "../api/KhachhangApi";
 import { getAllHopdong } from "../api/HopdongApi";
 import { getAllPhong } from "../api/phongApi";
-
+import {
+  getThanNhanByKhachHang,
+  updateThanNhan,
+  deleteThanNhan,
+  createThanNhan,
+} from "../api/ThannhanApi";
 export default function CustomerDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -12,6 +17,20 @@ export default function CustomerDetailPage() {
   const [customer, setCustomer] = useState(null);
   const [contract, setContract] = useState(null);
   const [room, setRoom] = useState(null);
+
+  const [relatives, setRelatives] = useState([]);
+  const [editingRelative, setEditingRelative] = useState(null);
+  const [relativeForm, setRelativeForm] = useState({
+    HoTen: "",
+    SDT: "",
+    QuanHe: "",
+  });
+  const [showAddRelativeModal, setShowAddRelativeModal] = useState(false);
+  const [newRelativeForm, setNewRelativeForm] = useState({
+    HoTen: "",
+    SDT: "",
+    QuanHe: "",
+  });
 
   const fetchDetail = async () => {
     try {
@@ -54,8 +73,24 @@ export default function CustomerDetailPage() {
     }
   };
 
+  const fetchRelatives = async () => {
+  try {
+    const res = await getThanNhanByKhachHang(id);
+
+    setRelatives(
+      Array.isArray(res.data.data)
+        ? res.data.data
+        : []
+    );
+  } catch (error) {
+    console.error("Lỗi tải thân nhân:", error);
+    setRelatives([]);
+  }
+};
+
   useEffect(() => {
     fetchDetail();
+    fetchRelatives();
   }, [id]);
 
   const formatMoney = (value) => {
@@ -83,6 +118,100 @@ export default function CustomerDetailPage() {
       </div>
     );
   }
+
+  const handleEditRelative = (relative) => {
+  setEditingRelative(relative);
+
+  setRelativeForm({
+    HoTen: relative.HoTen || "",
+    SDT: relative.SDT || "",
+    QuanHe: relative.QuanHe || "",
+  });
+};
+
+const handleUpdateRelative = async () => {
+  if (!relativeForm.HoTen) return alert("Vui lòng nhập họ tên thân nhân");
+  if (!relativeForm.SDT) return alert("Vui lòng nhập số điện thoại thân nhân");
+
+  try {
+    await updateThanNhan(editingRelative.MaTN, relativeForm);
+
+    alert("Cập nhật thân nhân thành công");
+
+    setEditingRelative(null);
+    setRelativeForm({
+      HoTen: "",
+      SDT: "",
+      QuanHe: "",
+    });
+
+    await fetchRelatives();
+  } catch (error) {
+    console.error("Lỗi cập nhật thân nhân:", error);
+
+    alert(
+      error.response?.data?.message ||
+        "Lỗi cập nhật thân nhân"
+    );
+  }
+};
+
+const handleDeleteRelative = async (MaTN) => {
+  const ok = window.confirm("Bạn có chắc muốn xóa thân nhân này không?");
+  if (!ok) return;
+
+  try {
+    await deleteThanNhan(MaTN);
+
+    alert("Xóa thân nhân thành công");
+    await fetchRelatives();
+  } catch (error) {
+    console.error("Lỗi xóa thân nhân:", error);
+
+    alert(
+      error.response?.data?.message ||
+        "Lỗi xóa thân nhân"
+    );
+  }
+};
+
+const handleCreateRelative = async () => {
+  if (!newRelativeForm.HoTen.trim()) {
+    return alert("Vui lòng nhập họ tên thân nhân");
+  }
+
+  if (!newRelativeForm.SDT.trim()) {
+    return alert("Vui lòng nhập số điện thoại thân nhân");
+  }
+
+  try {
+    await createThanNhan({
+      MaKH: Number(id),
+      HoTen: newRelativeForm.HoTen,
+      SDT: newRelativeForm.SDT,
+      QuanHe: newRelativeForm.QuanHe,
+    });
+
+    alert("Thêm thân nhân thành công");
+
+    setShowAddRelativeModal(false);
+    setNewRelativeForm({
+      HoTen: "",
+      SDT: "",
+      QuanHe: "",
+    });
+
+    await fetchRelatives();
+  } catch (error) {
+    console.error("Lỗi thêm thân nhân:", error);
+
+    alert(
+      error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Lỗi thêm thân nhân"
+    );
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#f4f7f5] px-12 py-10">
@@ -216,7 +345,209 @@ export default function CustomerDetailPage() {
             Khách hàng này chưa có hợp đồng đang hoạt động
           </div>
         )}
+
+        <div className="bg-white rounded-[30px] p-8 shadow-sm mt-8">
+          <h2 className="text-2xl font-black text-[#09152f] mb-6">
+            THÔNG TIN THÂN NHÂN
+          </h2>
+
+            <button
+              onClick={() => setShowAddRelativeModal(true)}
+              className="bg-green-600 text-white px-6 py-4 rounded-2xl font-black hover:bg-green-700 transition"
+            >
+              + THÊM THÂN NHÂN
+            </button>
+
+          {relatives.length > 0 ? (
+            <div className="space-y-4">
+              {relatives.map((relative) => (
+                <div
+                  key={relative.MaTN}
+                  className="grid grid-cols-12 items-center bg-[#f6f7f8] rounded-2xl px-6 py-5"
+                >
+                  <div className="col-span-4">
+                    <p className="text-lg font-black text-[#09152f]">
+                      {relative.HoTen}
+                    </p>
+                    <p className="text-gray-400 text-sm font-bold mt-1">
+                      Quan hệ: {relative.QuanHe || "---"}
+                    </p>
+                  </div>
+
+                  <div className="col-span-4">
+                    <p className="text-gray-500 font-bold">
+                      ☎ {relative.SDT}
+                    </p>
+                  </div>
+
+                  <div className="col-span-4 flex justify-end gap-3">
+                    <button
+                      onClick={() => handleEditRelative(relative)}
+                      className="bg-blue-50 text-blue-600 px-5 py-3 rounded-2xl font-black hover:bg-blue-600 hover:text-white transition"
+                    >
+                      SỬA
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteRelative(relative.MaTN)}
+                      className="bg-red-50 text-red-600 px-5 py-3 rounded-2xl font-black hover:bg-red-600 hover:text-white transition"
+                    >
+                      XÓA
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-gray-100 rounded-2xl p-6 text-gray-400 font-bold">
+              Khách hàng này chưa có thông tin thân nhân
+            </div>
+          )}
+        </div>
       </div>
+      {editingRelative && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-[36px] p-10 w-[560px] shadow-2xl">
+            <h2 className="text-3xl font-black text-[#09152f] mb-8">
+              SỬA THÔNG TIN THÂN NHÂN
+            </h2>
+
+            <div className="space-y-5">
+              <input
+                name="HoTen"
+                value={relativeForm.HoTen}
+                onChange={(e) =>
+                  setRelativeForm({
+                    ...relativeForm,
+                    HoTen: e.target.value,
+                  })
+                }
+                placeholder="Họ tên thân nhân"
+                className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+              />
+
+              <input
+                name="SDT"
+                value={relativeForm.SDT}
+                onChange={(e) =>
+                  setRelativeForm({
+                    ...relativeForm,
+                    SDT: e.target.value,
+                  })
+                }
+                placeholder="Số điện thoại"
+                className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+              />
+
+              <input
+                name="QuanHe"
+                value={relativeForm.QuanHe}
+                onChange={(e) =>
+                  setRelativeForm({
+                    ...relativeForm,
+                    QuanHe: e.target.value,
+                  })
+                }
+                placeholder="Quan hệ"
+                className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+              />
+            </div>
+
+            <div className="flex gap-4 mt-10">
+              <button
+                onClick={handleUpdateRelative}
+                className="flex-1 bg-green-600 text-white py-5 rounded-2xl font-black"
+              >
+                LƯU
+              </button>
+
+              <button
+                onClick={() => {
+                  setEditingRelative(null);
+                  setRelativeForm({
+                    HoTen: "",
+                    SDT: "",
+                    QuanHe: "",
+                  });
+                }}
+                className="flex-1 bg-gray-100 text-gray-500 py-5 rounded-2xl font-black"
+              >
+                HỦY
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showAddRelativeModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-[36px] p-10 w-[560px] shadow-2xl">
+            <h2 className="text-3xl font-black text-[#09152f] mb-8">
+              THÊM THÂN NHÂN
+            </h2>
+
+            <div className="space-y-5">
+              <input
+                value={newRelativeForm.HoTen}
+                onChange={(e) =>
+                  setNewRelativeForm({
+                    ...newRelativeForm,
+                    HoTen: e.target.value,
+                  })
+                }
+                placeholder="Họ tên thân nhân"
+                className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+              />
+
+              <input
+                value={newRelativeForm.SDT}
+                onChange={(e) =>
+                  setNewRelativeForm({
+                    ...newRelativeForm,
+                    SDT: e.target.value,
+                  })
+                }
+                placeholder="Số điện thoại thân nhân"
+                className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+              />
+
+              <input
+                value={newRelativeForm.QuanHe}
+                onChange={(e) =>
+                  setNewRelativeForm({
+                    ...newRelativeForm,
+                    QuanHe: e.target.value,
+                  })
+                }
+                placeholder="Quan hệ: Cha, mẹ, anh, chị..."
+                className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+              />
+            </div>
+
+            <div className="flex gap-4 mt-10">
+              <button
+                onClick={handleCreateRelative}
+                className="flex-1 bg-green-600 text-white py-5 rounded-2xl font-black"
+              >
+                LƯU
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowAddRelativeModal(false);
+                  setNewRelativeForm({
+                    HoTen: "",
+                    SDT: "",
+                    QuanHe: "",
+                  });
+                }}
+                className="flex-1 bg-gray-100 text-gray-500 py-5 rounded-2xl font-black"
+              >
+                HỦY
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

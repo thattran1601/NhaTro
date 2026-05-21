@@ -11,6 +11,7 @@ import CustomerModal from "../components/CustomerModal";
 import ContractModal from "../components/ContractModal";
 import { getAllPhong } from "../api/phongApi";
 import { createHopdong, getAllHopdong } from "../api/HopdongApi";
+import { createThanNhan } from "../api/ThannhanApi";
 
 export default function CustomerPage() {
   const navigate = useNavigate();
@@ -90,26 +91,42 @@ export default function CustomerPage() {
   });
 
   const handleSave = async (data) => {
-    try {
-      if (editing) {
-        await updateKhachhang(editing.MaKH, data);
-      } else {
-        await createKhachhang(data);
+  try {
+    const { ThanNhan, ...customerData } = data;
+
+    if (editing) {
+      await updateKhachhang(editing.MaKH, customerData);
+    } else {
+      const res = await createKhachhang(customerData);
+
+      const newMaKH =
+        res.data?.data?.MaKH ||
+        res.data?.MaKH ||
+        res.data?.insertId;
+
+      if (ThanNhan?.HoTen && ThanNhan?.SDT && newMaKH) {
+        await createThanNhan({
+          MaKH: newMaKH,
+          HoTen: ThanNhan.HoTen,
+          SDT: ThanNhan.SDT,
+          QuanHe: ThanNhan.QuanHe,
+        });
       }
-
-      await fetchData();
-      setShowModal(false);
-      setEditing(null);
-    } catch (error) {
-      console.error("Lỗi lưu khách hàng:", error);
-
-      alert(
-        error.response?.data?.message ||
-          error.response?.data?.error ||
-          "Lỗi lưu khách hàng"
-      );
     }
-  };
+
+    await fetchData();
+    setShowModal(false);
+    setEditing(null);
+  } catch (error) {
+    console.error("Lỗi lưu khách hàng:", error);
+
+    alert(
+      error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Lỗi lưu khách hàng"
+    );
+  }
+};
 
   const handleCreateContract = async (data) => {
     try {

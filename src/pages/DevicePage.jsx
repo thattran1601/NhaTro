@@ -223,15 +223,6 @@ export default function DevicePage() {
         </div>
 
         <div className="flex gap-4">
-          <button
-            onClick={() => {
-              setAssigning(null);
-              setShowAssignModal(true);
-            }}
-            className="bg-green-600 text-white px-9 py-5 rounded-2xl font-black shadow-lg hover:bg-green-700 transition"
-          >
-            + GÁN PHÒNG
-          </button>
 
           <button
             onClick={() => {
