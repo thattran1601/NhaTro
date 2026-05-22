@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getChiTietPhong,updatePhong } from "../api/phongApi";
-import AddRoomModal from "../components/AddRoomModal";
+import AddRoomModal from "../components/addRoomModal";
 
 export default function RoomDetailPage() {
   const { id } = useParams();
