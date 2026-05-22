@@ -12,12 +12,15 @@ import {
   deletePhong
 } from "../api/phongApi"
 
+import { getAllThietbi } from "../api/ThietbiAPI";
+
 export default function App() {
 
   const [rooms, setRooms] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [active, setActive] = useState("ALL")
   const [editRoom, setEditRoom] = useState(null)
+  const [devices, setDevices] = useState([])
 
   const fetchRooms = async () => {
     try {
@@ -37,19 +40,53 @@ export default function App() {
     }
   }
 
+  const fetchDevices = async () => {
+    try {
+      const res = await getAllThietbi();
+      setDevices(Array.isArray(res.data) ? res.data : []);
+    } catch (error) {
+      console.error("Lỗi tải thiết bị:", error);
+      setDevices([]);
+    }
+  };
+
   useEffect(() => {
-    fetchRooms()
+    fetchRooms();
+    fetchDevices();
+
   }, [])
 
    const addRoom = async (room) => {
+  try {
     if (editRoom) {
-      await updatePhong(editRoom.MaPhong, room)
-      setEditRoom(null)
+      await updatePhong(editRoom.MaPhong, {
+        TenPhong: room.TenPhong,
+        GiaThue: room.GiaThue,
+        TinhTrang: room.TinhTrang,
+      });
+
+      setEditRoom(null);
     } else {
-      await createPhong(room)
+      await createPhong({
+        TenPhong: room.TenPhong,
+        GiaThue: room.GiaThue,
+        SoNguoi: room.SoNguoi,
+        DanhSachThietBi: room.DanhSachThietBi,
+      });
     }
-    fetchRooms()
+
+    await fetchRooms();
+    await fetchDevices();
+  } catch (error) {
+    console.error("Lỗi lưu phòng:", error);
+
+    alert(
+      error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Lỗi lưu phòng"
+    );
   }
+};
   const removeRoom = async (id) => {
     await deletePhong(id)
     fetchRooms()
@@ -97,11 +134,12 @@ export default function App() {
 
       </div>
 
-      {showModal && (
+     {showModal && (
         <AddRoomModal
           setShowModal={setShowModal}
           addRoom={addRoom}
           editRoom={editRoom}
+          devices={devices}
         />
       )}
 

@@ -13,6 +13,7 @@ import DeviceModal from "../components/DeviceModal";
 import AssignDeviceModal from "../components/AssignDeviceModal";
 import { getAllPhong } from "../api/phongApi";
 
+
 export default function DevicePage() {
   const [devices, setDevices] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -21,6 +22,7 @@ export default function DevicePage() {
   const [assigning, setAssigning] = useState(null);
   const [active, setActive] = useState("ALL");
   const [rooms, setRooms] = useState([]);
+  const [roomFilter, setRoomFilter] = useState("ALL");  
 
   const fetchRooms = async () => {
   try {
@@ -146,14 +148,20 @@ export default function DevicePage() {
   }
 };
 
-  const filteredDevices = devices.filter((device) => {
-    if (active === "GOOD") return Number(device.TinhTrang) === 0;
-    if (active === "BROKEN") return Number(device.TinhTrang) === 1;
-    if (active === "REPAIR") return Number(device.TinhTrang) === 2;
-    if (active === "UNASSIGNED") return device.MaPhong === null;
+ const filteredDevices = devices.filter((device) => {
+  const matchStatus =
+    active === "ALL" ||
+    (active === "GOOD" && Number(device.TinhTrang) === 0) ||
+    (active === "BROKEN" && Number(device.TinhTrang) === 1) ||
+    (active === "REPAIR" && Number(device.TinhTrang) === 2) ||
+    (active === "UNASSIGNED" && !device.MaPhong);
 
-    return true;
-  });
+  const matchRoom =
+    roomFilter === "ALL" ||
+    Number(device.MaPhong) === Number(roomFilter);
+
+  return matchStatus && matchRoom;
+});
 
   const total = devices.length;
 
@@ -273,6 +281,23 @@ export default function DevicePage() {
           >
             CHƯA GÁN ({unassigned})
           </button>
+
+          <div className="flex items-center gap-4">
+            <select
+              value={roomFilter}
+              onChange={(e) => setRoomFilter(e.target.value)}
+              className="bg-[#f6f7f8] text-[#09152f] px-8 py-4 rounded-2xl font-black outline-none"
+            >
+              <option value="ALL">TẤT CẢ PHÒNG</option>
+
+              {rooms.map((room) => (
+                <option key={room.MaPhong} value={room.MaPhong}>
+                  {room.TenPhong}
+                </option>
+              ))}
+            </select>
+          </div>
+          
         </div>
       </div>
 

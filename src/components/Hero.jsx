@@ -4,7 +4,7 @@ export default function Hero({ setShowModal }) {
 
       <div>
 
-         <h1 className="text-5xl font-black mt-5 text-[#09152f]">
+         <h1 className="text-5xl font-black mt-5">
             QUẢN LÝ
             <span className="text-green-600 italic ml-3">PHÒNG</span>
           </h1>

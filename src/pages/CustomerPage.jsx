@@ -27,6 +27,7 @@ export default function CustomerPage() {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [roomFilter, setRoomFilter] = useState("ALL");
 
   const fetchData = async () => {
     try {
@@ -83,12 +84,17 @@ export default function CustomerPage() {
   const filteredCustomers = customers.filter((customer) => {
     const contract = getCustomerContract(customer.MaKH);
 
-    if (statusFilter === "ALL") return true;
-    if (statusFilter === "STAYING") return !!contract;
-    if (statusFilter === "LEFT") return !contract;
+    const matchStatus =
+      statusFilter === "ALL" ||
+      (statusFilter === "STAYING" && !!contract) ||
+      (statusFilter === "LEFT" && !contract);
 
-    return true;
-  });
+    const matchRoom =
+      roomFilter === "ALL" ||
+      Number(contract?.MaPhong) === Number(roomFilter);
+
+    return matchStatus && matchRoom;
+});
 
   const handleSave = async (data) => {
   try {
@@ -160,7 +166,7 @@ export default function CustomerPage() {
             CƠ SỞ DỮ LIỆU CƯ DÂN
           </div>
 
-          <h1 className="text-5xl font-black mt-5 text-[#09152f]">
+          <h1 className="text-5xl font-black mt-5">
             QUẢN LÝ
             <span className="text-green-600 italic ml-3">NGƯỜI THUÊ</span>
           </h1>
@@ -223,9 +229,19 @@ export default function CustomerPage() {
               </button>
             </div>
 
-            <button className="bg-[#f6f7f8] text-[#09152f] px-8 py-4 rounded-2xl font-black">
-              TẤT CẢ PHÒNG
-            </button>
+           <select
+            value={roomFilter}
+            onChange={(e) => setRoomFilter(e.target.value)}
+            className="bg-[#f6f7f8] text-[#09152f] px-8 py-4 rounded-2xl font-black outline-none"
+          >
+            <option value="ALL">TẤT CẢ PHÒNG</option>
+
+            {rooms.map((room) => (
+              <option key={room.MaPhong} value={room.MaPhong}>
+                {room.TenPhong}
+              </option>
+            ))}
+          </select>
           </div>
 
           {/* TABLE HEADER */}

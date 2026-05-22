@@ -11,6 +11,7 @@ export default function DeviceModal({
     TinhTrang: 0,
     MaPhong: null
   });
+  
 
   useEffect(() => {
     if (device) {

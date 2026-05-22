@@ -57,17 +57,30 @@ export default function RoomCard({ room , onEdit, onDelete}) {
 
               <button
                 onClick={() => navigate(`/rooms/${room.MaPhong}/detail`)}
-                className="bg-gray-100 text-[#09152f] py-4 rounded-2xl font-black"
+                className="flex-1 bg-[#eef4ff] text-blue-600 py-4 rounded-2xl font-black hover:bg-blue-600 hover:text-white transition shadow-sm"
               >
                 CHI TIẾT PHÒNG
               </button>
 
-              <button
-                onClick={() => navigate(`/rooms/${room.MaPhong}/contract`)}
-                className="bg-[#09152f] text-white py-4 rounded-2xl font-black"
-              >
-                HỢP ĐỒNG
-              </button>
+              {Number(room.TinhTrang) === 1 ? (
+                <button
+                  onClick={() => navigate(`/rooms/${room.MaPhong}/contract`)}
+                className="flex-1 bg-[#eef4ff] text-black-600 py-4 rounded-2xl font-black hover:bg-orange-500 hover:text-white transition shadow-sm"
+
+                >
+                  HỢP ĐỒNG
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    const ok = window.confirm("Bạn có chắc muốn xóa phòng này không?");
+                    if (ok) onDelete(room.MaPhong);
+                  }}
+                  className="flex-1 bg-red-50 text-red-500 py-4 rounded-2xl font-black hover:bg-red-600 hover:text-white transition shadow-sm"
+                >
+                  XÓA
+                </button>
+              )}
 
             </div>
 

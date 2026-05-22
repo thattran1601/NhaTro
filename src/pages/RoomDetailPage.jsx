@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getChiTietPhong } from "../api/phongApi";
+import { getChiTietPhong,updatePhong } from "../api/phongApi";
+import AddRoomModal from "../components/AddRoomModal";
 
 export default function RoomDetailPage() {
   const { id } = useParams();
@@ -9,6 +10,7 @@ export default function RoomDetailPage() {
   const [room, setRoom] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [devices, setDevices] = useState([]);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const fetchRoomDetail = async () => {
     try {
@@ -85,14 +87,42 @@ export default function RoomDetailPage() {
     return "Không rõ";
   };
 
+  const handleUpdateRoom = async (data) => {
+  try {
+    await updatePhong(room.MaPhong, data);
+
+    alert("Cập nhật phòng thành công");
+
+    setShowEditModal(false);
+    await fetchRoomDetail();
+  } catch (error) {
+    console.error("Lỗi cập nhật phòng:", error);
+
+    alert(
+      error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Lỗi cập nhật phòng"
+    );
+  }
+};
+
   return (
     <div className="min-h-screen bg-[#f4f7f5] px-12 py-10">
+      <div className="flex justify-between items-center mb-6">
       <button
-            onClick={() => navigate(-1)}
-            className="mb-6 bg-white text-[#09152f] px-6 py-3 rounded-2xl font-black shadow-sm hover:bg-gray-100 transition"
-          >
-            ← QUAY LẠI
-          </button>
+        onClick={() => navigate(-1)}
+        className="bg-white text-[#09152f] px-8 py-4 rounded-2xl font-black shadow-sm hover:bg-gray-100 transition"
+      >
+        ← QUAY LẠI
+      </button>
+
+      <button
+        onClick={() => setShowEditModal(true)}
+        className="bg-green-600 text-white px-10 py-4 rounded-2xl font-black shadow-lg hover:bg-green-700 transition"
+      >
+        SỬA PHÒNG
+      </button>
+    </div>
 
       <div className="mb-10">
         <div className="inline-flex items-center gap-2 bg-green-100 text-green-600 px-5 py-2 rounded-full font-bold text-sm tracking-widest">
@@ -206,6 +236,18 @@ export default function RoomDetailPage() {
           </div>
         )}
       </div>
+      {showEditModal && (
+        <AddRoomModal
+          setShowModal={setShowEditModal}
+          addRoom={handleUpdateRoom}
+          editRoom={{
+            MaPhong: room.MaPhong,
+            TenPhong: room.TenPhong,
+            GiaThue: room.GiaThue || 0,
+            TinhTrang: room.TinhTrangPhong,
+          }}
+        />
+      )}
     </div>
   );
 }
