@@ -136,15 +136,19 @@ export default function CustomerPage() {
 
   const handleCreateContract = async (data) => {
     try {
-      await createHopdong(data);
+      const res = await createHopdong({
+        ...data,
+        TrangThai: 1,
+      });
 
-      alert("Tạo hợp đồng thành công");
+      alert(res.data?.message || "Tạo hợp đồng thành công");
 
       setShowContractModal(false);
       setSelectedCustomer(null);
 
       await fetchRooms();
       await fetchContracts();
+      await fetchData();
     } catch (error) {
       console.error(error);
 
@@ -360,6 +364,7 @@ export default function CustomerPage() {
           <ContractModal
             customers={customers}
             rooms={rooms}
+            contracts={contracts}
             selectedCustomer={selectedCustomer}
             onSave={handleCreateContract}
             onClose={() => {

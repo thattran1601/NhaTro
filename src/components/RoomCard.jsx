@@ -1,12 +1,39 @@
 import { useNavigate } from "react-router-dom";
-export default function RoomCard({ room , onEdit, onDelete}) {
+export default function RoomCard({ room , onEdit, onDelete, contracts = []}) {
   const navigate = useNavigate();
   const giaThue= Number(room?.GiaThue || 0);
-  const getStatus= () => {
-    if(room?.TinhTrang === 0) return "Trống"
-    if(room?.TinhTrang === 1) return "Đã thuê"
-    return "Bảo trì"
-  }
+  const getStatus = (room) => {
+      if (Number(room.TinhTrang) === 2) {
+        return {
+          text: "BẢO TRÌ",
+          className: "bg-orange-50 text-orange-600 border-orange-200",
+        };
+      }
+
+      if (Number(room.TinhTrang) === 1) {
+        return {
+          text: "ĐÃ ĐẦY",
+          className: "bg-red-50 text-red-600 border-red-200",
+        };
+      }
+
+      return {
+        text: "CÒN CHỖ",
+        className: "bg-green-50 text-green-600 border-green-200",
+      };
+    };
+
+  const getRoomCurrentPeople = (MaPhong) => {
+    return contracts.filter(
+      (contract) =>
+        Number(contract.MaPhong) === Number(MaPhong) &&
+        Number(contract.TrangThai) === 1
+    ).length;
+  };
+  const currentPeople = getRoomCurrentPeople(room.MaPhong);
+  const maxPeople = Number(room.SoNguoi || 0);
+  const status = getStatus(room);
+
     return (
          <div className="bg-white rounded-[32px] p-5 shadow-sm hover:-translate-y-2 transition-all">
 
@@ -29,6 +56,10 @@ export default function RoomCard({ room , onEdit, onDelete}) {
                 <p className="text-green-500 font-bold text-xl">
                   {giaThue.toLocaleString("vi-VN")}đ
                 </p>
+
+                <p className="text-gray-500 font-bold mb-8">
+                  Số người: {currentPeople}/{maxPeople || "?"}
+                </p>
               </div>
 
             </div>
@@ -48,8 +79,9 @@ export default function RoomCard({ room , onEdit, onDelete}) {
                     : "text-orange-500"
                 }`}
               >
-                {getStatus()}
+                {getStatus(room)?.text}
               </span>
+
 
             </div>
 

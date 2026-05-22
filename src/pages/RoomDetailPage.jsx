@@ -8,59 +8,85 @@ export default function RoomDetailPage() {
   const navigate = useNavigate();
 
   const [room, setRoom] = useState(null);
-  const [customer, setCustomer] = useState(null);
+  const [customers, setCustomers] = useState(null);
   const [devices, setDevices] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
 
   const fetchRoomDetail = async () => {
-    try {
-      const res = await getChiTietPhong(id);
+  try {
+    const res = await getChiTietPhong(id);
 
-      const rows = Array.isArray(res.data) ? res.data : [];
+    const rows = Array.isArray(res.data) ? res.data : [];
 
-      if (rows.length === 0) {
-        setRoom(null);
-        setCustomer(null);
-        setDevices([]);
-        return;
-      }
+    if (rows.length === 0) {
+      setRoom(null);
+      setCustomers([]);
+      setDevices([]);
+      return;
+    }
 
-      const first = rows[0];
+    const first = rows[0];
 
-      setRoom({
-        MaPhong: first.MaPhong,
-        TenPhong: first.TenPhong,
-        TinhTrangPhong: first.TinhTrangPhong,
-      });
+    setRoom({
+      MaPhong: first.MaPhong,
+      TenPhong: first.TenPhong,
+      TinhTrangPhong: first.TinhTrangPhong,
+    });
 
-      setCustomer(
-        first.TenKhachHang
-          ? {
-              TenKhachHang: first.TenKhachHang,
-              SDT: first.SDT,
-            }
-          : null
+    // Gom danh sách người thuê theo API hiện tại
+    const uniqueCustomers = [];
+
+    rows.forEach((item) => {
+      if (!item.TenKhachHang) return;
+
+      const existed = uniqueCustomers.some(
+        (customer) =>
+          customer.TenKhachHang === item.TenKhachHang &&
+          customer.SDT === item.SDT
       );
 
-      const deviceList = rows
-        .filter((item) => item.TenThietBi)
-        .map((item, index) => ({
-          id: index,
+      if (!existed) {
+        uniqueCustomers.push({
+          TenKhachHang: item.TenKhachHang,
+          SDT: item.SDT,
+        });
+      }
+    });
+
+    setCustomers(uniqueCustomers);
+
+    // Gom danh sách thiết bị theo API hiện tại
+    const uniqueDevices = [];
+
+    rows.forEach((item) => {
+      if (!item.TenThietBi) return;
+
+      const existed = uniqueDevices.some(
+        (device) =>
+          device.TenThietBi === item.TenThietBi &&
+          device.SoSeri === item.SoSeri
+      );
+
+      if (!existed) {
+        uniqueDevices.push({
           TenThietBi: item.TenThietBi,
           SoSeri: item.SoSeri,
           TinhTrangThietBi: item.TinhTrangThietBi,
-        }));
+        });
+      }
+    });
 
-      setDevices(deviceList);
-    } catch (error) {
-      console.error("Lỗi tải chi tiết phòng:", error);
-      alert(
-        error.response?.data?.error ||
-          error.response?.data?.message ||
-          "Lỗi tải chi tiết phòng"
-      );
-    }
-  };
+    setDevices(uniqueDevices);
+  } catch (error) {
+    console.error("Lỗi tải chi tiết phòng:", error);
+
+    alert(
+      error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Lỗi tải chi tiết phòng"
+    );
+  }
+};
 
   useEffect(() => {
     fetchRoomDetail();
@@ -180,21 +206,40 @@ export default function RoomDetailPage() {
             NGƯỜI THUÊ
           </h2>
 
-          {customer ? (
-            <div className="bg-green-50 rounded-2xl p-6">
-              <p className="text-2xl font-black text-[#09152f]">
-                {customer.TenKhachHang}
-              </p>
+         {customers.length > 0 ? (
+  <div className="space-y-4">
+    {customers.map((customer, index) => (
+      <div
+        key={`${customer.TenKhachHang}-${customer.SDT}-${index}`}
+        className="bg-green-50 rounded-2xl p-6 flex justify-between items-center"
+      >
+        <div>
+          <p className="text-2xl font-black text-[#09152f] uppercase">
+            {customer.TenKhachHang}
+          </p>
 
-              <p className="text-gray-500 font-bold mt-3">
-                ☎ {customer.SDT}
-              </p>
-            </div>
-          ) : (
-            <div className="bg-gray-100 rounded-2xl p-6 text-gray-400 font-bold">
-              Phòng này chưa có người thuê
-            </div>
-          )}
+          <p className="text-gray-500 font-bold mt-3">
+            ☎ {customer.SDT || "---"}
+          </p>
+        </div>
+
+        <div className="text-right">
+          <p className="text-green-600 font-black">
+            NGƯỜI THUÊ #{index + 1}
+          </p>
+
+          <p className="text-gray-400 text-sm font-bold mt-2">
+            Đang lưu trú
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+) : (
+  <div className="bg-gray-100 rounded-2xl p-6 text-gray-400 font-bold">
+    Phòng này chưa có người thuê
+  </div>
+)}
         </div>
       </div>
 

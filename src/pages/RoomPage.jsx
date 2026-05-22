@@ -4,6 +4,7 @@ import Hero from "../components/Hero"
 import FilterTabs from "../components/FilterTabs"
 import RoomCard from "../components/RoomCard"
 import AddRoomModal from "../components/addRoomModal"
+import { getAllHopdong } from "../api/HopdongApi";
 
 import {
   getAllPhong,
@@ -21,6 +22,7 @@ export default function App() {
   const [active, setActive] = useState("ALL")
   const [editRoom, setEditRoom] = useState(null)
   const [devices, setDevices] = useState([])
+  const [contracts, setContracts] = useState([])
 
   const fetchRooms = async () => {
     try {
@@ -50,10 +52,25 @@ export default function App() {
     }
   };
 
+  const fetchContracts = async () => {
+  try {
+    const res = await getAllHopdong();
+
+    setContracts(
+      Array.isArray(res.data.data)
+        ? res.data.data
+        : []
+    );
+  } catch (error) {
+    console.error("Lỗi tải hợp đồng:", error);
+    setContracts([]);
+  }
+};
+
   useEffect(() => {
     fetchRooms();
     fetchDevices();
-
+    fetchContracts();
   }, [])
 
    const addRoom = async (room) => {
@@ -123,14 +140,15 @@ export default function App() {
 
       <div className="grid grid-cols-4 gap-8 mt-14">
 
-        {filteredRooms.map((room) => (
-          <RoomCard
-            key={room.MaPhong}
-            room={room}
-            onDelete={removeRoom}
-            onEdit={handleEdit}
-          />
-        ))}
+       {filteredRooms.map((room) => (
+        <RoomCard
+          key={room.MaPhong}
+          room={room}
+          contracts={contracts}
+          onEdit={handleEdit}
+          onDelete={removeRoom}
+        />
+      ))}
 
       </div>
 
