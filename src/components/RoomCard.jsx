@@ -12,7 +12,7 @@ export default function RoomCard({ room , onEdit, onDelete, contracts = []}) {
 
       if (Number(room.TinhTrang) === 1) {
         return {
-          text: "ĐÃ ĐẦY",
+          text: "ĐÃ THUÊ",
           className: "bg-red-50 text-red-600 border-red-200",
         };
       }
@@ -34,6 +34,11 @@ export default function RoomCard({ room , onEdit, onDelete, contracts = []}) {
   const maxPeople = Number(room.SoNguoi || 0);
   const status = getStatus(room);
 
+  const hasContract = contracts.some(
+    (contract) =>
+      Number(contract.MaPhong) === Number(room.MaPhong) &&
+      Number(contract.TrangThai) === 1
+  );
     return (
          <div className="bg-white rounded-[32px] p-5 shadow-sm hover:-translate-y-2 transition-all">
 
@@ -94,25 +99,24 @@ export default function RoomCard({ room , onEdit, onDelete, contracts = []}) {
                 CHI TIẾT PHÒNG
               </button>
 
-              {Number(room.TinhTrang) === 1 ? (
-                <button
-                  onClick={() => navigate(`/rooms/${room.MaPhong}/contracts`)}
-                className="flex-1 bg-[#eef4ff] text-black-600 py-4 rounded-2xl font-black hover:bg-orange-500 hover:text-white transition shadow-sm"
-
-                >
-                  HỢP ĐỒNG
-                </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    const ok = window.confirm("Bạn có chắc muốn xóa phòng này không?");
-                    if (ok) onDelete(room.MaPhong);
-                  }}
-                  className="flex-1 bg-red-50 text-red-500 py-4 rounded-2xl font-black hover:bg-red-600 hover:text-white transition shadow-sm"
-                >
-                  XÓA
-                </button>
-              )}
+             {hasContract ? (
+              <button
+                onClick={() => navigate(`/rooms/${room.MaPhong}/contracts`)}
+                className="flex-1 bg-orange-50 text-orange-600 py-4 rounded-2xl font-black hover:bg-orange-500 hover:text-white transition shadow-sm"
+              >
+                HỢP ĐỒNG
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  const ok = window.confirm("Bạn có chắc muốn xóa phòng này không?");
+                  if (ok) onDelete(room.MaPhong);
+                }}
+                className="flex-1 bg-red-50 text-red-500 py-4 rounded-2xl font-black hover:bg-red-600 hover:text-white transition shadow-sm"
+              >
+                XÓA
+              </button>
+            )}
 
             </div>
 

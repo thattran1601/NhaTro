@@ -14,3 +14,6 @@ export const createHopdong = (data) => {
 export const updateHopdong = (id, data) => {
     return API.put(`/api/hopdong/${id}`, data);
 }
+export const renewHopdong = (data) => {
+  return API.post("/api/hopdong/giahan", data);
+};
