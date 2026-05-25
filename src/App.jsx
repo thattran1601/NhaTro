@@ -1,34 +1,103 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
+import LoginPage from "./pages/LoginPage";
 import RoomPage from "./pages/RoomPage";
 import CustomerPage from "./pages/CustomerPage";
-import Navbar from "./components/Navbar";
 import DevicePage from "./pages/DevicePage";
-import ContractPage from "./pages/ContractPage";
 import RoomDetailPage from "./pages/RoomDetailPage";
 import CustomerDetailPage from "./pages/CustomerDetailPage";
+import ContractPage from "./pages/ContractPage";
+import Navbar from "./components/Navbar";
+
+function PrivateRoute({ children }) {
+  const user = localStorage.getItem("user");
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
+function MainLayout({ children }) {
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  );
+}
+
 export default function App() {
   return (
-    <BrowserRouter>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
 
-        {/* HEADER */}
-      <Navbar />
+      <Route
+        path="/"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <RoomPage />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
 
-      {/* ROUTES */}
-      <Routes>
-        <Route path="/" element={<RoomPage />} />
-        <Route path="/customers" element={<CustomerPage />} />
-        <Route path="/devices" element={<DevicePage />} />
-        <Route path="/rooms/:id/contract" element={<ContractPage />} />
-        <Route path="/rooms/:id/detail" element={<RoomDetailPage />} />
-        <Route path="/customers/:id/detail" element={<CustomerDetailPage />} />
-      </Routes>
-      
+      <Route
+        path="/customers"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <CustomerPage />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
 
-    </BrowserRouter>
+      <Route
+        path="/customers/:id/detail"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <CustomerDetailPage />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/devices"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <DevicePage />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/rooms/:id/detail"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <RoomDetailPage />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/rooms/:id/contracts"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <ContractPage />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+    </Routes>
   );
 }

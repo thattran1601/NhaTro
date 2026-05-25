@@ -1,6 +1,7 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const navItem = ({ isActive }) =>
     `
     px-8 py-4 rounded-2xl font-black tracking-widest text-sm
@@ -12,6 +13,10 @@ export default function Navbar() {
         : "bg-[#f6f7f8] text-gray-500 hover:bg-green-50 hover:text-green-600 hover:shadow-md hover:-translate-y-0.5"
     }
   `;
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   return (
     <div className="sticky top-0 z-40 px-8 py-5 bg-[#f4f7f5]/80 backdrop-blur-xl">
@@ -46,6 +51,13 @@ export default function Navbar() {
             <span>▣</span>
             THIẾT BỊ
           </NavLink>
+
+          <button
+            onClick={handleLogout}
+            className="bg-red-50 text-red-500 px-8 py-4 rounded-2xl font-black hover:bg-red-500 hover:text-white transition"
+          >
+            ĐĂNG XUẤT
+          </button>
         </div>
       </div>
     </div>
