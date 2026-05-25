@@ -96,7 +96,7 @@ export default function RoomCard({ room , onEdit, onDelete, contracts = []}) {
 
               {Number(room.TinhTrang) === 1 ? (
                 <button
-                  onClick={() => navigate(`/rooms/${room.MaPhong}/contract`)}
+                  onClick={() => navigate(`/rooms/${room.MaPhong}/contracts`)}
                 className="flex-1 bg-[#eef4ff] text-black-600 py-4 rounded-2xl font-black hover:bg-orange-500 hover:text-white transition shadow-sm"
 
                 >
