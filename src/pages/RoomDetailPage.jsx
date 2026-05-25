@@ -36,7 +36,7 @@ export default function RoomDetailPage() {
       MaPhong: roomInfo.MaPhong,
       TenPhong: roomInfo.TenPhong,
       GiaThue: roomInfo.GiaThue,
-      SoNguoi: roomInfo.SoNguoi,  
+      SoNguoi: roomInfo.SoNguoi,
       TinhTrangPhong: roomInfo.TinhTrang,
     });
 
@@ -111,7 +111,9 @@ export default function RoomDetailPage() {
   }
   // Hàm chuyển đổi trạng thái phòng thành chuỗi hiển thị
   const getRoomStatus = (status) => {
-    return Number(status) === 1 ? "Đang thuê" : "Phòng trống";
+    if (Number(status) === 1) return "Đang thuê";
+    if (Number(status) === 2) return "Bảo trì";
+    return "Phòng trống";
   };
   // Hàm chuyển đổi trạng thái thiết bị thành chuỗi hiển thị
   const getDeviceStatus = (status) => {
@@ -131,7 +133,7 @@ export default function RoomDetailPage() {
       });
 
       alert("Cập nhật phòng thành công");
-
+      // Đóng modal sau khi cập nhật thành công
       setShowEditModal(false);
       await fetchRoomDetail();
     } catch (error) {
@@ -205,7 +207,9 @@ export default function RoomDetailPage() {
                 className={`text-xl font-black ${
                   Number(room.TinhTrangPhong) === 1
                     ? "text-red-500"
-                    : "text-green-600"
+                    : Number(room.TinhTrangPhong) === 2
+                    ? "text-yellow-500"
+                    : "text-green-600"  
                 }`}
               >
                 {getRoomStatus(room.TinhTrangPhong)}
@@ -218,41 +222,43 @@ export default function RoomDetailPage() {
           <h2 className="text-2xl font-black text-[#09152f] mb-6">
             NGƯỜI THUÊ
           </h2>
-
+         {/* Nếu có khách thuê, hiển thị danh sách khách thuê, nếu không có, hiển thị thông báo phòng chưa có người thuê */}
          {customers.length > 0 ? (
-  <div className="space-y-4">
-    {customers.map((customer, index) => (
-      <div
-        key={`${customer.TenKhachHang}-${customer.SDT}-${index}`}
-        className="bg-green-50 rounded-2xl p-6 flex justify-between items-center"
-      >
-        <div>
-          <p className="text-2xl font-black text-[#09152f] uppercase">
-            {customer.TenKhachHang}
-          </p>
+          <div className="space-y-4">
+            {/* Duyệt qua danh sách khách thuê và hiển thị thông tin của từng khách */}
+            {customers.map((customer, index) => (
+              <div
+              // Sử dụng key duy nhất cho mỗi khách thuê để React có thể theo dõi chính xác các phần tử trong danh sách
+                key={`${customer.TenKhachHang}-${customer.SDT}-${index}`}
+                className="bg-green-50 rounded-2xl p-6 flex justify-between items-center"
+              >
+                <div>
+                  <p className="text-2xl font-black text-[#09152f] uppercase">
+                    {customer.TenKhachHang}
+                  </p>
 
-          <p className="text-gray-500 font-bold mt-3">
-            ☎ {customer.SDT || "---"}
-          </p>
-        </div>
+                  <p className="text-gray-500 font-bold mt-3">
+                    ☎ {customer.SDT || "---"}
+                  </p>
+                </div>
 
-        <div className="text-right">
-          <p className="text-green-600 font-black">
-            NGƯỜI THUÊ #{index + 1}
-          </p>
+                <div className="text-right">
+                  <p className="text-green-600 font-black">
+                    NGƯỜI THUÊ #{index + 1}
+                  </p>
 
-          <p className="text-gray-400 text-sm font-bold mt-2">
-            Đang lưu trú
-          </p>
-        </div>
-      </div>
-    ))}
-  </div>
-) : (
-  <div className="bg-gray-100 rounded-2xl p-6 text-gray-400 font-bold">
-    Phòng này chưa có người thuê
-  </div>
-)}
+                  <p className="text-gray-400 text-sm font-bold mt-2">
+                    Đang lưu trú
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-gray-100 rounded-2xl p-6 text-gray-400 font-bold">
+            Phòng này chưa có người thuê
+          </div>
+        )}
         </div>
       </div>
 
@@ -260,11 +266,13 @@ export default function RoomDetailPage() {
         <h2 className="text-2xl font-black text-[#09152f] mb-6">
           THIẾT BỊ TRONG PHÒNG
         </h2>
-
+        {/* Nếu có thiết bị, hiển thị danh sách thiết bị, nếu không có, hiển thị thông báo phòng chưa có thiết bị */}
         {devices.length > 0 ? (
           <div className="space-y-4">
+            {/* Duyệt qua danh sách thiết bị và hiển thị thông tin của từng thiết bị */}
             {devices.map((device) => (
               <div
+              // Sử dụng key duy nhất cho mỗi thiết bị để React có thể theo dõi chính xác các phần tử trong danh sách
                 key={device.id}
                 className="grid grid-cols-12 items-center bg-[#f6f7f8] rounded-2xl px-6 py-5"
               >
