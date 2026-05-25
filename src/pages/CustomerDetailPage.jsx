@@ -119,6 +119,12 @@ export default function CustomerDetailPage() {
     );
   }
 
+  const getCCCDImageUrl = (filename) => {
+  if (!filename) return null;
+
+  return `${import.meta.env.VITE_API_URL.replace("/api", "")}/uploads/cccd/${filename}`;
+};
+
   const handleEditRelative = (relative) => {
   setEditingRelative(relative);
 
@@ -265,6 +271,41 @@ const handleCreateRelative = async () => {
               <p className="text-xl font-black text-[#09152f]">
                 {customer.CCCD || "---"}
               </p>
+            </div>
+            <div className="bg-white rounded-[30px] p-8 shadow-sm mt-8">
+              <h2 className="text-2xl font-black text-[#09152f] mb-6">
+                ẢNH CCCD
+              </h2>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div className="bg-[#f6f7f8] rounded-2xl p-5">
+                  <p className="text-gray-400 font-bold mb-4">Mặt trước CCCD</p>
+
+                  {getCCCDImageUrl(customer.TruocCCCD) ? (
+                    <img
+                      src={getCCCDImageUrl(customer.TruocCCCD)}
+                      alt="CCCD mặt trước"
+                      className="w-full h-64 object-cover rounded-2xl"
+                    />
+                  ) : (
+                    <p className="text-gray-400 font-bold">Chưa có ảnh</p>
+                  )}
+                </div>
+
+                <div className="bg-[#f6f7f8] rounded-2xl p-5">
+                  <p className="text-gray-400 font-bold mb-4">Mặt sau CCCD</p>
+
+                  {getCCCDImageUrl(customer.SauCCCD) ? (
+                    <img
+                      src={getCCCDImageUrl(customer.SauCCCD)}
+                      alt="CCCD mặt sau"
+                      className="w-full h-64 object-cover rounded-2xl"
+                    />
+                  ) : (
+                    <p className="text-gray-400 font-bold">Chưa có ảnh</p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>

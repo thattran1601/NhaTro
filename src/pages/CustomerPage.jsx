@@ -96,43 +96,68 @@ export default function CustomerPage() {
     return matchStatus && matchRoom;
 });
 
-  const handleSave = async (data) => {
-  try {
-    const { ThanNhan, ...customerData } = data;
+  const handleSave = async (formData, thanNhanData) => {
+    try {
+      const HoTen = formData.get("HoTen");
+      const CCCD = formData.get("CCCD");
+      const SDT = formData.get("SDT");
 
-    if (editing) {
-      await updateKhachhang(editing.MaKH, customerData);
-    } else {
-      const res = await createKhachhang(customerData);
-
-      const newMaKH =
-        res.data?.data?.MaKH ||
-        res.data?.MaKH ||
-        res.data?.insertId;
-
-      if (ThanNhan?.HoTen && ThanNhan?.SDT && newMaKH) {
-        await createThanNhan({
-          MaKH: newMaKH,
-          HoTen: ThanNhan.HoTen,
-          SDT: ThanNhan.SDT,
-          QuanHe: ThanNhan.QuanHe,
-        });
+      if (!HoTen || !CCCD || !SDT) {
+        alert("Vui lòng nhập đầy đủ họ tên, CCCD và số điện thoại");
+        return;
       }
+
+      // Kiểm tra trùng CCCD ở frontend để tránh backend rơi vào nhánh lỗi req.files.forEach
+      const isDuplicateCCCD = customers.some((customer) => {
+        if (editing) {
+          return (
+            String(customer.CCCD) === String(CCCD) &&
+            Number(customer.MaKH) !== Number(editing.MaKH)
+          );
+        }
+
+        return String(customer.CCCD) === String(CCCD);
+      });
+
+      if (isDuplicateCCCD) {
+        alert("Số CCCD này đã tồn tại trong hệ thống");
+        return;
+      }
+
+      if (editing) {
+        await updateKhachhang(editing.MaKH, formData);
+      } else {
+        const res = await createKhachhang(formData);
+
+        const newMaKH =
+          res.data?.data?.MaKH ||
+          res.data?.MaKH ||
+          res.data?.insertId;
+
+        if (thanNhanData && newMaKH) {
+          await createThanNhan({
+            MaKH: newMaKH,
+            HoTen: thanNhanData.HoTen,
+            SDT: thanNhanData.SDT,
+            QuanHe: thanNhanData.QuanHe,
+          });
+        }
+      }
+
+      await fetchData();
+
+      setShowModal(false);
+      setEditing(null);
+    } catch (error) {
+      console.error("Lỗi lưu khách hàng:", error);
+
+      alert(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Lỗi lưu khách hàng"
+      );
     }
-
-    await fetchData();
-    setShowModal(false);
-    setEditing(null);
-  } catch (error) {
-    console.error("Lỗi lưu khách hàng:", error);
-
-    alert(
-      error.response?.data?.message ||
-        error.response?.data?.error ||
-        "Lỗi lưu khách hàng"
-    );
-  }
-};
+  };
 
   const handleCreateContract = async (data) => {
     try {

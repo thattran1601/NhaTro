@@ -8,9 +8,9 @@ export const getAllKhachhang = () => {
 export const getKhachhangById = (id) => {
     return API.get(`/api/khachhang/${id}`);
 };
-export const createKhachhang = (data) => {
-    return API.post("/api/khachhang", data);
+export const createKhachhang = (formData) => {
+  return API.post("/api/khachhang", formData);
 };
-export const updateKhachhang = (id, data) => {
-    return API.put(`/api/khachhang/${id}`, data);
+export const updateKhachhang = (id, formData) => {
+  return API.put(`/api/khachhang/${id}`, formData);
 };

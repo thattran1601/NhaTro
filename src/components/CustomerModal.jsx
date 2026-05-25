@@ -5,7 +5,8 @@ export default function CustomerModal({ customer, onSave, onClose }) {
     HoTen: "",
     CCCD: "",
     SDT: "",
-    AnhCCCD: "",
+    TruocCCCD: null,
+    SauCCCD: null,
     ThanNhan: {
       HoTen: "",
       SDT: "",
@@ -22,7 +23,8 @@ export default function CustomerModal({ customer, onSave, onClose }) {
         HoTen: customer.HoTen || "",
         CCCD: customer.CCCD || "",
         SDT: customer.SDT || "",
-        AnhCCCD: customer.AnhCCCD || "",
+        TruocCCCD: null,
+        SauCCCD: null,
         ThanNhan: {
           HoTen: "",
           SDT: "",
@@ -44,17 +46,24 @@ export default function CustomerModal({ customer, onSave, onClose }) {
     });
   };
 
-  const handleThanNhanChange = (e) => {
+  const handleFileChange = (e) => {
     setForm({
       ...form,
-      ThanNhan: {
-        ...form.ThanNhan,
-        [e.target.name]: e.target.value,
-      },
+      [e.target.name]: e.target.files[0],
     });
   };
 
-  const handleSubmit = () => {
+  const handleThanNhanChange = (e) => {
+      setForm({
+        ...form,
+        ThanNhan: {
+          ...form.ThanNhan,
+          [e.target.name]: e.target.value,
+        },
+      });
+    };
+
+    const handleSubmit = () => {
     if (!form.HoTen.trim()) {
       return alert("Vui lòng nhập họ tên cư dân");
     }
@@ -67,23 +76,23 @@ export default function CustomerModal({ customer, onSave, onClose }) {
       return alert("Vui lòng nhập số điện thoại");
     }
 
-    if (showThanNhan) {
-      if (!form.ThanNhan.HoTen.trim()) {
-        return alert("Vui lòng nhập họ tên thân nhân");
-      }
+    const formData = new FormData();
 
-      if (!form.ThanNhan.SDT.trim()) {
-        return alert("Vui lòng nhập số điện thoại thân nhân");
-      }
+    formData.append("HoTen", form.HoTen.trim());
+    formData.append("CCCD", form.CCCD.trim());
+    formData.append("SDT", form.SDT.trim());
+
+    if (form.TruocCCCD) {
+      formData.append("TruocCCCD", form.TruocCCCD);
     }
 
-    onSave({
-      HoTen: form.HoTen,
-      CCCD: form.CCCD,
-      SDT: form.SDT,
-      AnhCCCD: form.AnhCCCD,
-      ThanNhan: showThanNhan ? form.ThanNhan : null,
-    });
+    if (form.SauCCCD) {
+      formData.append("SauCCCD", form.SauCCCD);
+    }
+
+    const thanNhanData = showThanNhan ? form.ThanNhan : null;
+
+    onSave(formData, thanNhanData);
   };
 
   return (
@@ -98,7 +107,7 @@ export default function CustomerModal({ customer, onSave, onClose }) {
             <p className="text-gray-400 font-bold mt-2">
               {customer
                 ? "Cập nhật thông tin người thuê"
-                : "Nhập thông tin người thuê và thân nhân nếu có"}
+                : "Nhập thông tin người thuê và ảnh CCCD"}
             </p>
           </div>
 
@@ -110,8 +119,12 @@ export default function CustomerModal({ customer, onSave, onClose }) {
           </button>
         </div>
 
-        <div className={customer ? "grid grid-cols-1 gap-6" : "grid grid-cols-2 gap-8"}>
-          {/* CỘT THÔNG TIN KHÁCH HÀNG */}
+        <div
+          className={
+            customer ? "grid grid-cols-1 gap-6" : "grid grid-cols-2 gap-8"
+          }
+        >
+          {/* THÔNG TIN CƯ DÂN */}
           <div>
             <h3 className="text-xl font-black text-[#09152f] mb-5">
               THÔNG TIN CƯ DÂN
@@ -142,17 +155,43 @@ export default function CustomerModal({ customer, onSave, onClose }) {
                 className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
               />
 
-              <input
-                name="AnhCCCD"
-                value={form.AnhCCCD}
-                onChange={handleChange}
-                placeholder="Link ảnh CCCD"
-                className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
-              />
+              <div>
+                <p className="text-gray-400 font-bold mb-2 ml-2">
+                  Ảnh CCCD mặt trước
+                </p>
+
+                <input
+                  type="file"
+                  name="TruocCCCD"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+                />
+              </div>
+
+              <div>
+                <p className="text-gray-400 font-bold mb-2 ml-2">
+                  Ảnh CCCD mặt sau
+                </p>
+
+                <input
+                  type="file"
+                  name="SauCCCD"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
+                />
+              </div>
+
+              {customer && (
+                <div className="bg-green-50 text-green-600 px-6 py-5 rounded-2xl font-bold text-sm">
+                  Nếu không chọn ảnh mới, hệ thống sẽ giữ ảnh CCCD cũ.
+                </div>
+              )}
             </div>
           </div>
 
-          {/* CỘT THÔNG TIN THÂN NHÂN */}
+          {/* THÂN NHÂN */}
           {!customer && (
             <div>
               <div className="flex items-center justify-between mb-5">
@@ -196,15 +235,11 @@ export default function CustomerModal({ customer, onSave, onClose }) {
                     placeholder="Quan hệ: Cha, mẹ, anh, chị..."
                     className="w-full bg-[#f6f7f8] px-6 py-5 rounded-2xl outline-none font-semibold"
                   />
-
-                  <div className="bg-green-50 text-green-600 px-6 py-5 rounded-2xl font-bold text-sm">
-                    Thân nhân sẽ được lưu kèm sau khi tạo cư dân thành công.
-                  </div>
                 </div>
               ) : (
                 <div className="bg-[#f6f7f8] rounded-2xl p-8 text-gray-400 font-bold leading-relaxed">
-                  Bạn có thể bật “Thêm thân nhân” để nhập người liên hệ khẩn cấp.
-                  Nếu chưa có thông tin, có thể bổ sung sau trong trang chi tiết khách hàng.
+                  Có thể thêm thân nhân ngay bây giờ hoặc bổ sung sau trong
+                  trang chi tiết khách hàng.
                 </div>
               )}
             </div>
