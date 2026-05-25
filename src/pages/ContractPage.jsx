@@ -9,14 +9,15 @@ export default function ContractPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [contracts, setContracts] = useState([]);
-  const [room, setRoom] = useState(null);
-  const [customersMap, setCustomersMap] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [showRenewModal, setShowRenewModal] = useState(false);
-  const [renewContract, setRenewContract] = useState(null);
-  const [renewEndDate, setRenewEndDate] = useState("");
+  const [contracts, setContracts] = useState([]);// Danh sách hợp đồng của phòng
+  const [room, setRoom] = useState(null);// Thông tin phòng
+  const [customersMap, setCustomersMap] = useState({});// Bản đồ khách hàng theo MaKH để dễ truy xuất khi hiển thị hợp đồng
+  const [loading, setLoading] = useState(true);// Trạng thái tải dữ liệu
+  const [showRenewModal, setShowRenewModal] = useState(false);// Trạng thái hiển thị modal gia hạn hợp đồng
+  const [renewContract, setRenewContract] = useState(null);// Hợp đồng đang được chọn để gia hạn
+  const [renewEndDate, setRenewEndDate] = useState("");// Ngày kết thúc mới khi gia hạn hợp đồng
 
+  // Hàm tải dữ liệu hợp đồng và thông tin phòng, khách hàng liên quan
   const fetchContractData = async () => {
     try {
       setLoading(true);
@@ -330,7 +331,6 @@ const handleRenewContract = async () => {
                         </p>
                       </div>
                     </div>
-
                   <div className="flex items-center gap-3">
                     <span
                       className={`${status.className} px-8 py-4 rounded-2xl font-black`}

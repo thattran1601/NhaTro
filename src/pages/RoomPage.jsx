@@ -1,7 +1,4 @@
 import { useEffect, useState } from "react"
-import Navbar from "../components/Navbar"
-import Hero from "../components/Hero"
-import FilterTabs from "../components/FilterTabs"
 import RoomCard from "../components/RoomCard"
 import AddRoomModal from "../components/addRoomModal"
 import { getAllHopdong } from "../api/HopdongApi";
@@ -16,14 +13,21 @@ import {
 import { getAllThietbi } from "../api/ThietbiAPI";
 
 export default function App() {
-
+//Khai báo state và các hàm xử lý
   const [rooms, setRooms] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [active, setActive] = useState("ALL")
   const [editRoom, setEditRoom] = useState(null)
   const [devices, setDevices] = useState([])
   const [contracts, setContracts] = useState([])
+  const tabs = [
+        "ALL",
+        "EMPTY",
+        "RENTED",
+        "MAINTAIN"
+]
 
+  // Hàm lấy danh sách phòng từ API
   const fetchRooms = async () => {
     try {
       const res = await getAllPhong()
@@ -41,7 +45,7 @@ export default function App() {
       setRooms([])
     }
   }
-
+  // Hàm lấy danh sách thiết bị từ API
   const fetchDevices = async () => {
     try {
       const res = await getAllThietbi();
@@ -51,7 +55,7 @@ export default function App() {
       setDevices([]);
     }
   };
-
+  // Hàm lấy danh sách hợp đồng từ API
   const fetchContracts = async () => {
   try {
     const res = await getAllHopdong();
@@ -66,13 +70,13 @@ export default function App() {
     setContracts([]);
   }
 };
-
+  //useEffect gọi API khi mở trang
   useEffect(() => {
     fetchRooms();
     fetchDevices();
     fetchContracts();
   }, [])
-
+  // Hàm thêm hoặc cập nhật phòng
    const addRoom = async (room) => {
   try {
     if (editRoom) {
@@ -80,6 +84,7 @@ export default function App() {
         TenPhong: room.TenPhong,
         GiaThue: room.GiaThue,
         TinhTrang: room.TinhTrang,
+        SoNguoi: room.SoNguoi,
       });
 
       setEditRoom(null);
@@ -104,15 +109,17 @@ export default function App() {
     );
   }
 };
+// Hàm xóa phòng
   const removeRoom = async (id) => {
-    await deletePhong(id)
-    fetchRooms()
+    await deletePhong(id)// Gọi API xóa phòng
+    fetchRooms()// Tải lại danh sách phòng sau khi xóa
   }
-  
+  // Hàm xử lý khi nhấn nút sửa phòng
   const handleEdit = (room) => {
-    setEditRoom(room)
-    setShowModal(true)
+    setEditRoom(room)// Set phòng cần sửa vào state
+    setShowModal(true)// Hiển thị modal
   }
+  // Hàm lọc danh sách phòng theo trạng thái (tất cả, trống, đã thuê, bảo trì)
   const filteredRooms = Array.isArray(rooms)
     ? rooms.filter((room) => {
         if (active === "EMPTY")
@@ -131,15 +138,50 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#eef2ef] px-12 py-8">
       
-      <Hero setShowModal={setShowModal} />
+      <div className="bg-white rounded-3xl shadow-md p-8 mt-6 flex justify-between items-center">
 
-      <FilterTabs
-        active={active}
-        setActive={setActive}
-      />
+      <div>
+
+         <h1 className="text-5xl font-black mt-5">
+            QUẢN LÝ
+            <span className="text-green-600 italic ml-3">PHÒNG</span>
+          </h1>
+          <p className="text-gray-400 font-black tracking-[0.35em] text-sm mt-5">
+            HỆ THỐNG QUẢN LÝ PHÒNG TRỌ
+          </p>
+      </div>
+
+      <button
+        onClick={() => setShowModal(true)}
+        className="bg-green-500 text-white px-10 py-5 rounded-3xl text-lg font-semibold shadow-lg"
+      >
+        + THÊM PHÒNG
+      </button>
+
+    </div>
+
+      <div className="bg-white rounded-4xl p-4 mt-14 gap-5 shadow-sm">
+            {tabs.map((tab) => (
+                <button
+                    key={tab}
+                    onClick={() => setActive(tab)}
+                    className={`px-8 py-4 rounded-2xl font-semibold transition-all
+                         ${
+                        active === tab
+                            ? "bg-green-50 text-green-500"
+                            : "text-gray-500"
+                    }`}
+                    >
+                    {tab =="ALL"&& "TẤT CẢ"}
+                    {tab =="RENTED"&& "ĐÃ THUÊ"}
+                    {tab =="EMPTY"&& "TRỐNG"}
+                    {tab =="MAINTAIN"&& "BẢO TRÌ"}
+                </button>
+            ))}
+        </div>
 
       <div className="grid grid-cols-4 gap-8 mt-14">
-
+      {/* Hiển thị danh sách phòng đã được lọc */}
        {filteredRooms.map((room) => (
         <RoomCard
           key={room.MaPhong}
