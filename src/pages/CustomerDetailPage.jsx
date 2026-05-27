@@ -285,7 +285,7 @@ const handleCreateRelative = async () => {
                     <img
                       src={getCCCDImageUrl(customer.TruocCCCD)}
                       alt="CCCD mặt trước"
-                      className="w-full h-64 object-cover rounded-2xl"
+                      className="w-full h-full object-contain"
                     />
                   ) : (
                     <p className="text-gray-400 font-bold">Chưa có ảnh</p>
@@ -299,7 +299,7 @@ const handleCreateRelative = async () => {
                     <img
                       src={getCCCDImageUrl(customer.SauCCCD)}
                       alt="CCCD mặt sau"
-                      className="w-full h-64 object-cover rounded-2xl"
+                      className="w-full h-full object-contain"
                     />
                   ) : (
                     <p className="text-gray-400 font-bold">Chưa có ảnh</p>
